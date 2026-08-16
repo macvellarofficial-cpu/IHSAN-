@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-heading: 'Poppins', 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif: 'Playfair Display', Georgia, serif;
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: #1A3020;
+    background-color: #FDFCF8;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+    color: #1A3020;
+  }
+}
+
+/* Natural Tones Islamic Geometric Subtle Motif Background */
+.bg-islamic-pattern {
+  background-color: #1A3020;
+  background-image: radial-gradient(rgba(242, 125, 38, 0.12) 1px, transparent 1px),
+    radial-gradient(rgba(230, 226, 211, 0.08) 1px, #1A3020 1px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+}
+
+.bg-pattern-light {
+  background-color: #FDFCF8;
+  background-image: radial-gradient(rgba(26, 48, 32, 0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Custom Scrollbars in Natural Tones */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F5F2EA;
+}
+::-webkit-scrollbar-thumb {
+  background: #E6E2D3;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5A5A40;
+}
+
+/* Print utilities for Donation Receipts */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-receipt, #printable-receipt * {
+    visibility: visible;
+  }
+  #printable-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+

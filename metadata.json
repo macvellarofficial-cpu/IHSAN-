@@ -1,0 +1,6 @@
+{
+  "name": "Ihsan Children's Foundation",
+  "description": "Official website and humanitarian management portal for Ihsan Children's Foundation based in Mutundwe, Kampala, Uganda. Supporting vulnerable children, refugees, and communities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
