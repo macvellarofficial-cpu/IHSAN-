@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { 
   Heart, 
   ShieldCheck, 
@@ -75,7 +76,12 @@ export const HomePage: React.FC<HomePageProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             {/* Left Content */}
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+            <motion.div 
+              className="lg:col-span-7 space-y-6 text-center lg:text-left"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+            >
               
               {/* Location Badge */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#2C4D35] border border-[#E6E2D3]/20 text-[#F27D26] text-xs font-bold uppercase tracking-wider shadow-xs">
@@ -142,10 +148,15 @@ export const HomePage: React.FC<HomePageProps> = ({
                 </div>
               </div>
 
-            </div>
+            </motion.div>
 
             {/* Right Hero Visual Card */}
-            <div className="lg:col-span-5 relative">
+            <motion.div 
+              className="lg:col-span-5 relative"
+              initial={{ opacity: 0, scale: 0.98, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.95, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            >
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-[#2C4D35] bg-[#142619]">
                 <img
                   src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1000&q=80"
@@ -176,7 +187,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
           </div>
         </div>

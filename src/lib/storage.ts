@@ -26,6 +26,14 @@ import {
   INITIAL_DOCUMENTS,
   CURRENCIES 
 } from '../data/initialData';
+import {
+  syncDonationToSupabase,
+  syncVolunteerToSupabase,
+  syncPartnershipToSupabase,
+  syncContactMessageToSupabase,
+  syncSafeguardingReportToSupabase,
+  syncNewsletterSubscriberToSupabase
+} from './supabase';
 
 const STORAGE_KEYS = {
   PROJECTS: 'icf_projects_v1',
@@ -189,6 +197,9 @@ export const recordDonation = (donation: Omit<DonationRecord, 'id' | 'receiptNum
   const updated = [newRecord, ...current];
   localStorage.setItem(STORAGE_KEYS.DONATIONS, JSON.stringify(updated));
 
+  // Sync to Supabase in background
+  syncDonationToSupabase(newRecord).catch(() => {});
+
   // If donation target matches a project, update project amount raised
   if (donation.fundCategory) {
     const projects = getProjects();
@@ -224,6 +235,10 @@ export const submitVolunteerApplication = (app: Omit<VolunteerApplication, 'id' 
   };
   const updated = [newApp, ...current];
   localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated));
+
+  // Sync to Supabase in background
+  syncVolunteerToSupabase(newApp).catch(() => {});
+
   return newApp;
 };
 
@@ -252,6 +267,10 @@ export const submitPartnershipInquiry = (inquiry: Omit<PartnershipInquiry, 'id' 
   };
   const updated = [newInquiry, ...current];
   localStorage.setItem(STORAGE_KEYS.PARTNERSHIPS, JSON.stringify(updated));
+
+  // Sync to Supabase in background
+  syncPartnershipToSupabase(newInquiry).catch(() => {});
+
   return newInquiry;
 };
 
@@ -275,6 +294,10 @@ export const submitContactMessage = (msg: Omit<ContactMessage, 'id' | 'submitted
   };
   const updated = [newMsg, ...current];
   localStorage.setItem(STORAGE_KEYS.CONTACTS, JSON.stringify(updated));
+
+  // Sync to Supabase in background
+  syncContactMessageToSupabase(newMsg).catch(() => {});
+
   return newMsg;
 };
 
@@ -300,6 +323,10 @@ export const submitSafeguardingReport = (report: Omit<SafeguardingReport, 'id' |
   };
   const updated = [newReport, ...current];
   localStorage.setItem(STORAGE_KEYS.SAFEGUARDING, JSON.stringify(updated));
+
+  // Sync to Supabase in background
+  syncSafeguardingReportToSupabase(newReport).catch(() => {});
+
   return newReport;
 };
 
@@ -355,6 +382,7 @@ export const subscribeNewsletter = (email: string): boolean => {
       list.push(email);
       localStorage.setItem(STORAGE_KEYS.NEWSLETTER, JSON.stringify(list));
     }
+    syncNewsletterSubscriberToSupabase(email).catch(() => {});
     return true;
   } catch {
     return true;

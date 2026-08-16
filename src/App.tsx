@@ -38,6 +38,7 @@ import { SafeguardingModal } from './components/common/SafeguardingModal';
 import { VolunteerModal } from './components/common/VolunteerModal';
 import { ProjectDetailModal } from './components/common/ProjectDetailModal';
 import { FloatingActions } from './components/common/FloatingActions';
+import { ScrollProgressBar } from './components/common/ScrollProgressBar';
 
 // Pages
 import { HomePage } from './pages/HomePage';
@@ -125,6 +126,7 @@ export function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-800 font-sans selection:bg-amber-500 selection:text-slate-950">
+      <ScrollProgressBar />
       
       {/* Global Header (Hidden only in admin console if preferred, or always accessible) */}
       {activeTab !== 'admin' && (

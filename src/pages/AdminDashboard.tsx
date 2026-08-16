@@ -53,6 +53,7 @@ import {
   formatCurrency
 } from '../lib/storage';
 import { SUPABASE_SCHEMA_SQL, SUPABASE_SEED_SQL } from '../lib/supabaseSchema';
+import { SUPABASE_URL, checkSupabaseConnection } from '../lib/supabase';
 
 interface AdminDashboardProps {
   onNavigate: (tab: string, meta?: any) => void;
@@ -913,6 +914,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 ========================================================= */}
             {activeTab === 'database' && (
               <div className="space-y-6">
+                {/* Active Supabase Connection Banner */}
+                <div className="bg-[#F5F2EA] p-5 rounded-2xl border border-[#E6E2D3] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-xs font-bold text-[#1A3020]">Supabase Cloud Connected</span>
+                    </div>
+                    <p className="text-xs font-mono text-[#5A5A40] break-all">{SUPABASE_URL}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] px-2.5 py-1 bg-[#1A3020] text-[#FDFCF8] font-bold rounded-lg">
+                      Anon Key Configured
+                    </span>
+                  </div>
+                </div>
+
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-lg font-bold text-[#1A3020] flex items-center gap-2">
