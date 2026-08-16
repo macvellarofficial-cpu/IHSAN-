@@ -26,7 +26,19 @@ import {
   getStoredStories, 
   getStoredSiteSettings, 
   getStoredImpactMetrics, 
-  getStoredTeamMembers 
+  getStoredTeamMembers,
+  fetchProjects,
+  fetchPrograms,
+  fetchDonations,
+  fetchVolunteers,
+  fetchPartnerships,
+  fetchContactMessages,
+  fetchSafeguardingReports,
+  fetchBlogPosts,
+  fetchStories,
+  fetchSiteSettings,
+  fetchImpactMetrics,
+  fetchTeamMembers
 } from './lib/storage';
 
 // Common UI Components
@@ -89,8 +101,9 @@ export function App() {
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
-  // Load Data on Mount
+  // Load Data on Mount (Instant fast-cache + Live Supabase Query)
   useEffect(() => {
+    // 1. Initial cached render
     setProjects(getStoredProjects());
     setPrograms(getStoredPrograms());
     setDonations(getStoredDonations());
@@ -103,6 +116,56 @@ export function App() {
     setSiteSettings(getStoredSiteSettings());
     setImpactMetrics(getStoredImpactMetrics());
     setTeamMembers(getStoredTeamMembers());
+
+    // 2. Fetch live data from Supabase asynchronously
+    const loadFromSupabase = async () => {
+      try {
+        const [
+          remoteProjects,
+          remotePrograms,
+          remoteDonations,
+          remoteVolunteers,
+          remoteSafeguarding,
+          remotePartnerships,
+          remoteMessages,
+          remotePosts,
+          remoteStories,
+          remoteSettings,
+          remoteMetrics,
+          remoteTeam
+        ] = await Promise.allSettled([
+          fetchProjects(),
+          fetchPrograms(),
+          fetchDonations(),
+          fetchVolunteers(),
+          fetchSafeguardingReports(),
+          fetchPartnerships(),
+          fetchContactMessages(),
+          fetchBlogPosts(),
+          fetchStories(),
+          fetchSiteSettings(),
+          fetchImpactMetrics(),
+          fetchTeamMembers()
+        ]);
+
+        if (remoteProjects.status === 'fulfilled' && remoteProjects.value) setProjects(remoteProjects.value);
+        if (remotePrograms.status === 'fulfilled' && remotePrograms.value) setPrograms(remotePrograms.value);
+        if (remoteDonations.status === 'fulfilled' && remoteDonations.value) setDonations(remoteDonations.value);
+        if (remoteVolunteers.status === 'fulfilled' && remoteVolunteers.value) setVolunteers(remoteVolunteers.value);
+        if (remoteSafeguarding.status === 'fulfilled' && remoteSafeguarding.value) setSafeguardingReports(remoteSafeguarding.value);
+        if (remotePartnerships.status === 'fulfilled' && remotePartnerships.value) setPartnerships(remotePartnerships.value);
+        if (remoteMessages.status === 'fulfilled' && remoteMessages.value) setMessages(remoteMessages.value);
+        if (remotePosts.status === 'fulfilled' && remotePosts.value) setPosts(remotePosts.value);
+        if (remoteStories.status === 'fulfilled' && remoteStories.value) setStories(remoteStories.value);
+        if (remoteSettings.status === 'fulfilled' && remoteSettings.value) setSiteSettings(remoteSettings.value);
+        if (remoteMetrics.status === 'fulfilled' && remoteMetrics.value) setImpactMetrics(remoteMetrics.value);
+        if (remoteTeam.status === 'fulfilled' && remoteTeam.value) setTeamMembers(remoteTeam.value);
+      } catch (err) {
+        console.warn('Supabase initial fetch note:', err);
+      }
+    };
+
+    loadFromSupabase();
   }, []);
 
   // Scroll to top on navigation

@@ -27,12 +27,27 @@ import {
   CURRENCIES 
 } from '../data/initialData';
 import {
+  supabase,
+  fetchProjectsFromSupabase,
+  fetchProgramsFromSupabase,
+  fetchDonationsFromSupabase,
+  fetchVolunteersFromSupabase,
+  fetchPartnershipsFromSupabase,
+  fetchContactMessagesFromSupabase,
+  fetchSafeguardingReportsFromSupabase,
+  fetchBlogPostsFromSupabase,
+  fetchStoriesFromSupabase,
+  fetchSiteSettingsFromSupabase,
+  fetchImpactMetricsFromSupabase,
+  fetchTeamMembersFromSupabase,
   syncDonationToSupabase,
   syncVolunteerToSupabase,
   syncPartnershipToSupabase,
   syncContactMessageToSupabase,
   syncSafeguardingReportToSupabase,
-  syncNewsletterSubscriberToSupabase
+  syncNewsletterSubscriberToSupabase,
+  updateVolunteerStatusInSupabase,
+  updateSafeguardingStatusInSupabase
 } from './supabase';
 
 const STORAGE_KEYS = {
@@ -54,7 +69,7 @@ const STORAGE_KEYS = {
   IS_ADMIN_AUTH: 'icf_admin_auth_v1',
 };
 
-// Initial simulated initial donations for realism
+// Initial simulated donations for realism
 const INITIAL_DONATIONS: DonationRecord[] = [
   {
     id: 'don-1',
@@ -111,6 +126,158 @@ const INITIAL_DONATIONS: DonationRecord[] = [
   }
 ];
 
+// ============================================================================
+// ASYNCHRONOUS SUPABASE DATA FETCHING QUERIES (Primary Real-Data Interface)
+// ============================================================================
+
+/**
+ * Fetch projects asynchronously from Supabase, caching in localStorage
+ */
+export const fetchProjects = async (): Promise<Project[]> => {
+  const remote = await fetchProjectsFromSupabase();
+  if (remote && remote.length > 0) {
+    localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(remote));
+    return remote;
+  }
+  return getProjects();
+};
+
+/**
+ * Fetch programs asynchronously from Supabase
+ */
+export const fetchPrograms = async (): Promise<Program[]> => {
+  const remote = await fetchProgramsFromSupabase();
+  if (remote && remote.length > 0) {
+    localStorage.setItem(STORAGE_KEYS.PROGRAMS, JSON.stringify(remote));
+    return remote;
+  }
+  return getPrograms();
+};
+
+/**
+ * Fetch stories asynchronously from Supabase
+ */
+export const fetchStories = async (): Promise<Story[]> => {
+  const remote = await fetchStoriesFromSupabase();
+  if (remote && remote.length > 0) {
+    localStorage.setItem(STORAGE_KEYS.STORIES, JSON.stringify(remote));
+    return remote;
+  }
+  return getStories();
+};
+
+/**
+ * Fetch blog posts asynchronously from Supabase
+ */
+export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
+  const remote = await fetchBlogPostsFromSupabase();
+  if (remote && remote.length > 0) {
+    localStorage.setItem(STORAGE_KEYS.BLOG_POSTS, JSON.stringify(remote));
+    return remote;
+  }
+  return getBlogPosts();
+};
+
+/**
+ * Fetch donations asynchronously from Supabase
+ */
+export const fetchDonations = async (): Promise<DonationRecord[]> => {
+  const remote = await fetchDonationsFromSupabase();
+  if (remote && remote.length > 0) {
+    localStorage.setItem(STORAGE_KEYS.DONATIONS, JSON.stringify(remote));
+    return remote;
+  }
+  return getDonations();
+};
+
+/**
+ * Fetch volunteer applications asynchronously from Supabase
+ */
+export const fetchVolunteers = async (): Promise<VolunteerApplication[]> => {
+  const remote = await fetchVolunteersFromSupabase();
+  if (remote && remote.length > 0) {
+    localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(remote));
+    return remote;
+  }
+  return getVolunteers();
+};
+
+/**
+ * Fetch partnership inquiries asynchronously from Supabase
+ */
+export const fetchPartnerships = async (): Promise<PartnershipInquiry[]> => {
+  const remote = await fetchPartnershipsFromSupabase();
+  if (remote && remote.length > 0) {
+    localStorage.setItem(STORAGE_KEYS.PARTNERSHIPS, JSON.stringify(remote));
+    return remote;
+  }
+  return getPartnerships();
+};
+
+/**
+ * Fetch contact messages asynchronously from Supabase
+ */
+export const fetchContactMessages = async (): Promise<ContactMessage[]> => {
+  const remote = await fetchContactMessagesFromSupabase();
+  if (remote && remote.length > 0) {
+    localStorage.setItem(STORAGE_KEYS.CONTACTS, JSON.stringify(remote));
+    return remote;
+  }
+  return getContactMessages();
+};
+
+/**
+ * Fetch safeguarding reports asynchronously from Supabase
+ */
+export const fetchSafeguardingReports = async (): Promise<SafeguardingReport[]> => {
+  const remote = await fetchSafeguardingReportsFromSupabase();
+  if (remote && remote.length > 0) {
+    localStorage.setItem(STORAGE_KEYS.SAFEGUARDING, JSON.stringify(remote));
+    return remote;
+  }
+  return getSafeguardingReports();
+};
+
+/**
+ * Fetch site settings asynchronously from Supabase
+ */
+export const fetchSiteSettings = async (): Promise<SiteSettings> => {
+  const remote = await fetchSiteSettingsFromSupabase();
+  if (remote) {
+    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(remote));
+    return remote;
+  }
+  return getSiteSettings();
+};
+
+/**
+ * Fetch impact metrics asynchronously from Supabase
+ */
+export const fetchImpactMetrics = async (): Promise<ImpactMetric[]> => {
+  const remote = await fetchImpactMetricsFromSupabase();
+  if (remote && remote.length > 0) {
+    localStorage.setItem(STORAGE_KEYS.METRICS, JSON.stringify(remote));
+    return remote;
+  }
+  return getImpactMetrics();
+};
+
+/**
+ * Fetch team members asynchronously from Supabase
+ */
+export const fetchTeamMembers = async (): Promise<TeamMember[]> => {
+  const remote = await fetchTeamMembersFromSupabase();
+  if (remote && remote.length > 0) {
+    localStorage.setItem(STORAGE_KEYS.TEAM, JSON.stringify(remote));
+    return remote;
+  }
+  return getTeamMembers();
+};
+
+// ============================================================================
+// CACHED / SYNCHRONOUS ACCESSORS (For immediate first-paint rendering)
+// ============================================================================
+
 export const getProjects = (): Project[] => {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.PROJECTS);
@@ -120,8 +287,40 @@ export const getProjects = (): Project[] => {
   }
 };
 
-export const saveProjects = (projects: Project[]) => {
+export const saveProjects = async (projects: Project[]) => {
   localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
+  // In addition, update Supabase if configured
+  try {
+    for (const p of projects) {
+      await supabase.from('projects').upsert({
+        id: p.id,
+        title: p.title,
+        slug: p.slug,
+        category: p.category,
+        status: p.status,
+        location: p.location,
+        country: p.country,
+        region: p.region,
+        hero_image: p.heroImage,
+        gallery_images: p.galleryImages,
+        situation: p.situation,
+        objective: p.objective,
+        planned_activities: p.plannedActivities,
+        target_beneficiaries: p.targetBeneficiaries,
+        amount_required: p.amountRequired,
+        amount_raised: p.amountRaised,
+        featured: p.featured,
+        urgent_appeal: p.urgentAppeal,
+        verified_data: p.verifiedData,
+        start_date: p.startDate,
+        completion_date: p.completionDate || null,
+        updates: p.updates,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id' });
+    }
+  } catch (e) {
+    console.warn('Supabase projects upsert notice:', e);
+  }
 };
 
 export const saveStories = (stories: Story[]) => {
@@ -132,6 +331,7 @@ export const updateSafeguardingStatus = (id: string, status: SafeguardingReport[
   const current = getSafeguardingReports();
   const updated = current.map(s => s.id === id ? { ...s, status, adminNotes: adminNotes || s.adminNotes } : s);
   localStorage.setItem(STORAGE_KEYS.SAFEGUARDING, JSON.stringify(updated));
+  updateSafeguardingStatusInSupabase(id, status, adminNotes).catch(() => {});
   return updated;
 };
 
@@ -246,6 +446,7 @@ export const updateVolunteerStatus = (id: string, status: VolunteerApplication['
   const current = getVolunteers();
   const updated = current.map(v => v.id === id ? { ...v, status, adminNotes: adminNotes || v.adminNotes } : v);
   localStorage.setItem(STORAGE_KEYS.VOLUNTEERS, JSON.stringify(updated));
+  updateVolunteerStatusInSupabase(id, status, adminNotes).catch(() => {});
 };
 
 export const getPartnerships = (): PartnershipInquiry[] => {
@@ -341,6 +542,26 @@ export const getSiteSettings = (): SiteSettings => {
 
 export const saveSiteSettings = (settings: SiteSettings) => {
   localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+  (async () => {
+    try {
+      await supabase.from('site_settings').upsert({
+        ngo_name: settings.ngoName,
+        head_office: settings.headOffice,
+        founded_year: settings.foundedYear,
+        ngo_registration_number: settings.ngoRegistrationNumber,
+        is_registration_verified: settings.isRegistrationVerified,
+        contact_phone: settings.contactPhone,
+        whatsapp_number: settings.whatsappNumber,
+        contact_email: settings.contactEmail,
+        office_hours: settings.officeHours,
+        announcement_notice: settings.announcementNotice,
+        show_announcement: settings.showAnnouncement,
+        updated_at: new Date().toISOString()
+      });
+    } catch {
+      // ignore
+    }
+  })();
 };
 
 export const getImpactMetrics = (): ImpactMetric[] => {
@@ -424,6 +645,7 @@ export const convertFromCurrency = (amountInTarget: number, sourceCurrency: Curr
   return amountInTarget / conf.rateFromUSD;
 };
 
+// Backwards compatibility aliases mapped to async & fast accessors
 export const getStoredProjects = getProjects;
 export const getStoredPrograms = getPrograms;
 export const getStoredStories = getStories;
@@ -436,4 +658,3 @@ export const getStoredSafeguardingReports = getSafeguardingReports;
 export const getStoredSiteSettings = getSiteSettings;
 export const getStoredImpactMetrics = getImpactMetrics;
 export const getStoredTeamMembers = getTeamMembers;
-
